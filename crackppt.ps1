@@ -1,35 +1,48 @@
-# Path to the password protected ppt file
+# Defineix el camí complet del fitxer de PowerPoint protegit amb contrasenya
 $PowerPointFile = "C:\path\to\pptfile.pptx"
 
-# path to the dictionary with passworks to try
-$PasswordFile = "C:\path\to\passwords-list.txt"
+# Defineix el camí complet de l'arxiu de contrasenyes
+$PasswordFile = "C:\path\to\passwords-file.txt"
 
-#----------------------------------------
-# Create a PPT Application object
+# Crea un objecte PowerPoint per obrir el fitxer
+Write-Host "Create object PowerPoint.Application... " -NoNewline
 $PowerPoint = New-Object -ComObject PowerPoint.Application
+Write-Host "OK"
 
-# Load password lists into memory
-$Passwords = Get-Content $PasswordFile
-
+# Llegeix la llista de contrasenyes des de l'arxiu de text
 $trencat = 0
 $pwds = 0
 
-# Let's try each password to open the ppt file
-foreach ($Password in $Passwords) {
-    $pwds++
-    try {
-        $Presentation = $PowerPoint.ProtectedViewWindows.Open($PowerPointFile, $Password)
-        Write-Host "\rTrying key # $pwds: '$Password'"
-        $Presentation.Close()
-        $PowerPoint.Quit()
-        $trencat = 1
-        break
+# Intenta obrir el fitxer de PowerPoint amb cada contrasenya de la llista
+try {
+    Write-Host "Opening passwords file '$($PasswordFile)... " -NoNewline
+    $reader = [System.IO.StreamReader]::new($PasswordFile)
+    Write-Host "OK"
+    
+    while ( ($line = $reader.ReadLine()) ) {
+        $Password = $line
+        $pwds++
+        Write-Host "`rTrying key #$($pwds): '$Password'                                    " -NoNewline
+        # Intenta obrir el fitxer de PowerPoint 
+        try {
+            $Presentation = $PowerPoint.ProtectedViewWindows.Open($PowerPointFile, $Password)
+            $Presentation.Close()
+            $PowerPoint.Quit()
+            $trencat = 1
+            break
+        }
+        catch {
+        }
     }
-    catch {
+}
+finally {
+    if ($null -ne $reader) {
+        $reader.Dispose()
     }
 }
 
-# cleanup
+
+# Tanca l'objecte PowerPoint
 try {
     $PowerPoint.Quit()
 }
@@ -37,7 +50,7 @@ catch {
 }
 
 if ($trencat) {
-    Write-Host "\rYeehah! '$PowerPointFile' has been cracked! Password: '$Password'\n"
+    Write-Host "`n'$PowerPointFile' cracked with password '$Password'"
 } else {
-    Write-Host "\rOooooh, couldn't crack the file '$PowerPointFile'\n"
+    Write-Host "`nSorry, couldn't crack file '$PowerPointFile'"
 }

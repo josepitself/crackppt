@@ -10,8 +10,8 @@ def variacions_maj_min(terme):
 # Defineix els arguments de la línia de comandes
 parser = argparse.ArgumentParser()
 parser.add_argument("-O", "--output-file", help="File where to write all the passwords", required=True)
-parser.add_argument("-T", "--terms", help="Terms to combine to produce passwords", nargs='+', required=True)
-parser.add_argument("-S", "--separators", help="Separators to use to join terms", nargs='+', required=True)
+parser.add_argument("-t", "--terms", help="Terms to combine to produce passwords", nargs='+', required=True)
+parser.add_argument("-s", "--separators", help="Separators to use to join terms", nargs='+', required=True)
 parser.add_argument("-c", "--calc-only", help="Calculate the number of passwords to generate but not generate them", action='store_true')
 args = parser.parse_args()
 

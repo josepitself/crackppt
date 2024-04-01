@@ -19,7 +19,7 @@ print(f"{n}\n\t[passwords] ", end='')
 
 pwds = cracker.generate_strings_with_separators_to_file(all_words, separators, pwdfile)
 
-print("Step2...")
+print(f"{pwds}\nStep2...")
 print("\t[case combinations] ")
 tcases = cracker.all_case_combinations(terms)
 n=0

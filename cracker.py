@@ -67,13 +67,15 @@ def generate_strings_with_separators_to_file(matrix, separators, file_path):
     """
     def all_combinations_to_file(words, sep, file, prefix=''):
         """Helper function to recursively find and write all combinations for a given list of words."""
+        n = 0
         if len(words) == 1:
             file.write(prefix + words[0] + '\n')
-            rows += 1
+            n += 1
         else:
             # For each combination and separator, write the combination directly to the file
             for s in sep:
-                all_combinations_to_file(words[1:], sep, file, prefix + words[0] + s)
+                n += all_combinations_to_file(words[1:], sep, file, prefix + words[0] + s)
+        return n
 
     # Open the file once and pass the file object to the helper function
     rowcount = 0

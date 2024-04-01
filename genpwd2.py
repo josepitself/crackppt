@@ -2,26 +2,36 @@ import cracker
 
 terms = ['darth', 'vader', 'vs', 'luke', 'skywalker']
 separators = [ '', ' ' ]
-fitxer = './passwords.txt'
+pwdfile = './passwords.txt'
 
-print("Step1...")
+print("Step1... ")
+print("\t[case combinations] ")
 tcases = cracker.all_case_combinations(terms)
-all_words = cracker.generate_word_combinations(tcases)
-all_combinations = cracker.generate_strings_with_separators(all_words, separators)
+n=0
+for i in range(0, len(tcases)):
+    n += len(tcases[i])
+print(f"{n}\n\t[all words] ", end='')
+print("\n")
 
-print("writing file...")
-file = open(fitxer, 'w')
-for item in all_combinations:
-    file.write(f'{item}\n')
+all_words = cracker.generate_word_combinations(tcases)
+n = len(all_words)
+print(f"{n}\n\t[passwords] ", end='')
+
+pwds = cracker.generate_strings_with_separators_to_file(all_words, separators, pwdfile)
 
 print("Step2...")
-terms = [ 'luke', 'skywalker', 'vs', 'darth', 'vader' ]
-separators = [ '', ' ' ]
+print("\t[case combinations] ")
 tcases = cracker.all_case_combinations(terms)
-all_words = cracker.generate_word_combinations(tcases)
-all_combinations = cracker.generate_strings_with_separators(all_words, separators)
-print("writing file...")
-for item in all_combinations:
-    file.write(f'{item}\n')
+n=0
+for i in range(0, len(tcases)):
+    n += len(tcases[i])
+print(f"{n}\n\t[all words] ", end='')
+print("\n")
 
-print("Done!")
+all_words = cracker.generate_word_combinations(tcases)
+n = len(all_words)
+print(f"{n}\n\t[passwords] ", end='')
+
+pwds += cracker.generate_strings_with_separators_to_file(all_words, separators, pwdfile)
+
+print(f"DONE! {pwds} passwords generated")

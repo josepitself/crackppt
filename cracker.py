@@ -56,3 +56,31 @@ def generate_strings_with_separators(matrix, separators):
         result_list.extend(all_combinations(row, separators))
     
     return result_list
+
+def generate_strings_with_separators_to_file(matrix, separators, file_path):
+    """
+    Generate strings where each string is formed by concatenating the words
+    in each row of the matrix with all possible combinations of the given separators,
+    and write these strings directly to a file.
+    This approach is designed to work efficiently with large datasets by avoiding
+    to keep all results in memory.
+    """
+    rows = 0
+
+    def all_combinations_to_file(words, sep, file, prefix=''):
+        """Helper function to recursively find and write all combinations for a given list of words."""
+        if len(words) == 1:
+            file.write(prefix + words[0] + '\n')
+            rows += 1
+        else:
+            # For each combination and separator, write the combination directly to the file
+            for s in sep:
+                all_combinations_to_file(words[1:], sep, file, prefix + words[0] + s)
+
+    # Open the file once and pass the file object to the helper function
+    with open(file_path, 'a') as file:
+        for row in matrix:
+            all_combinations_to_file(row, separators, file)
+    return rows
+
+

@@ -15,7 +15,7 @@ $pwds = 0
 
 # Intenta obrir el fitxer de PowerPoint amb cada contrasenya de la llista
 # Cada $PptRecycleBatch recicla l'objecte PowerPoint per alliberar memòria
-$PptRecycleBatch = 5000
+# $PptRecycleBatch = 20
 try {
     Write-Host "Opening passwords file '$($PasswordFile)... " -NoNewline
     $reader = [System.IO.StreamReader]::new($PasswordFile)
@@ -36,12 +36,17 @@ try {
         catch {
         }
 
-        if ($pwds % $PptRecycleBatch -eq 0) {
-            Write-Host "`nReciclant objecte PowerPoint... " -NoNewline
-            $PowerPoint.Dispose()
-            $PowerPoint = New-Object -ComObject PowerPoint.Application
-            Write-Host "OK"
-        }
+        # if ($pwds % $PptRecycleBatch -eq 0) {
+        #     Write-Host "`nReciclant objecte PowerPoint... " -NoNewline
+        #     [System.Runtime.InteropServices.Marshal]::ReleaseComObject($PowerPoint) | Out-Null
+        #     Remove-Variable $PowerPoint
+        #     # Força la recollida de brossa
+        #     [gc]::Collect()
+        #     [gc]::WaitForPendingFinalizers()
+        #     # crear un nou objecte PPT
+        #     $PowerPoint = New-Object -ComObject PowerPoint.Application
+        #     Write-Host "OK"
+        # }
     }
 }
 finally {

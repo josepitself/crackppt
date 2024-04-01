@@ -1,8 +1,8 @@
 # Defineix el camí complet del fitxer de PowerPoint protegit amb contrasenya
-$PowerPointFile = "C:\path\to\pptfile.pptx"
+$PowerPointFile = "C:\devel\crackppt\data\viatge2021.pptx"
 
 # Defineix el camí complet de l'arxiu de contrasenyes
-$PasswordFile = "C:\path\to\passwords-file.txt"
+$PasswordFile = "C:\devel\crackppt\data\passwords.txt"
 
 # Crea un objecte PowerPoint per obrir el fitxer
 Write-Host "Create object PowerPoint.Application... " -NoNewline
@@ -14,6 +14,8 @@ $trencat = 0
 $pwds = 0
 
 # Intenta obrir el fitxer de PowerPoint amb cada contrasenya de la llista
+# Cada $PptRecycleBatch recicla l'objecte PowerPoint per alliberar memòria
+$PptRecycleBatch = 5000
 try {
     Write-Host "Opening passwords file '$($PasswordFile)... " -NoNewline
     $reader = [System.IO.StreamReader]::new($PasswordFile)
@@ -32,6 +34,13 @@ try {
             break
         }
         catch {
+        }
+
+        if ($pwds % $PptRecycleBatch -eq 0) {
+            Write-Host "`nReciclant objecte PowerPoint... " -NoNewline
+            $PowerPoint.Dispose()
+            $PowerPoint = New-Object -ComObject PowerPoint.Application
+            Write-Host "OK"
         }
     }
 }

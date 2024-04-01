@@ -65,8 +65,6 @@ def generate_strings_with_separators_to_file(matrix, separators, file_path):
     This approach is designed to work efficiently with large datasets by avoiding
     to keep all results in memory.
     """
-    rows = 0
-
     def all_combinations_to_file(words, sep, file, prefix=''):
         """Helper function to recursively find and write all combinations for a given list of words."""
         if len(words) == 1:
@@ -78,9 +76,10 @@ def generate_strings_with_separators_to_file(matrix, separators, file_path):
                 all_combinations_to_file(words[1:], sep, file, prefix + words[0] + s)
 
     # Open the file once and pass the file object to the helper function
+    rowcount = 0
     with open(file_path, 'a') as file:
         for row in matrix:
-            all_combinations_to_file(row, separators, file)
-    return rows
+            rowcount += all_combinations_to_file(row, separators, file)
+    return rowcount
 
 

@@ -1,8 +1,9 @@
 # Defineix el camí complet del fitxer de PowerPoint protegit amb contrasenya
-$PowerPointFile = "C:\devel\crackppt\data\viatge2021.pptx"
-
 # Defineix el camí complet de l'arxiu de contrasenyes
-$PasswordFile = "C:\devel\crackppt\data\passwords.txt"
+$PowerPointFile = "C:\tmp\viatge2021.pptx"
+$PasswordFile = "C:\tmp\x.txt"
+
+$ResumeFile = $PowerPointFile + ".resume"
 
 # Crea un objecte PowerPoint per obrir el fitxer
 Write-Host "Create object PowerPoint.Application... " -NoNewline
@@ -13,14 +14,23 @@ Write-Host "OK"
 $trencat = 0
 $pwds = 0
 
+Write-Host "Opening passwords file <$($PasswordFile)>... " -NoNewline
+$reader = [System.IO.StreamReader]::new($PasswordFile)
+Write-Host "OK"
+
+# Si estava a mitges, continua
+if (Test-Path -Path $ResumeFile) {
+    Write-Host "Resume file found, catching up... "
+    $continue = Get-Content -Path $ResumeFile
+    while ( ($line = $reader.ReadLine()) -and $pwds -le $continue) {
+        $pwds++
+        Write-Host "`rSkipping $($continue) passwords... $($pwds)" -NoNewline 
+    }
+    Write-Host " "
+}
+
 # Intenta obrir el fitxer de PowerPoint amb cada contrasenya de la llista
-# Cada $PptRecycleBatch recicla l'objecte PowerPoint per alliberar memòria
-# $PptRecycleBatch = 20
 try {
-    Write-Host "Opening passwords file '$($PasswordFile)... " -NoNewline
-    $reader = [System.IO.StreamReader]::new($PasswordFile)
-    Write-Host "OK"
-    
     while ( ($line = $reader.ReadLine()) ) {
         $Password = $line
         $pwds++
@@ -35,22 +45,16 @@ try {
         }
         catch {
         }
-
-        # if ($pwds % $PptRecycleBatch -eq 0) {
-        #     Write-Host "`nReciclant objecte PowerPoint... " -NoNewline
-        #     [System.Runtime.InteropServices.Marshal]::ReleaseComObject($PowerPoint) | Out-Null
-        #     Remove-Variable $PowerPoint
-        #     # Força la recollida de brossa
-        #     [gc]::Collect()
-        #     [gc]::WaitForPendingFinalizers()
-        #     # crear un nou objecte PPT
-        #     $PowerPoint = New-Object -ComObject PowerPoint.Application
-        #     Write-Host "OK"
-        # }
     }
 }
 finally {
     if ($null -ne $reader) {
+        if ($pwds -gt 0 -and -not $reader.EndOfStream) {
+            Write-Host "`nSaving resume file..." -NoNewline
+            $pwds = $pwds - 1
+            $pwds | Out-File -FilePath $ResumeFile
+            Write-Host "OK"
+        }
         $reader.Dispose()
     }
 }

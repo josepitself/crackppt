@@ -1,12 +1,12 @@
 # Defineix el camí complet del fitxer de PowerPoint protegit amb contrasenya
 # Defineix el camí complet de l'arxiu de contrasenyes
-$PowerPointFile = "C:\tmp\viatge2021.pptx"
-$PasswordFile = "C:\tmp\x.txt"
+$PowerPointFile = "C:\devel\crackppt\data\viatge2021.pptx"
+$PasswordFile = "C:\devel\crackppt\data\passwords.txt"
 
 $ResumeFile = $PowerPointFile + ".resume"
 
 # Crea un objecte PowerPoint per obrir el fitxer
-Write-Host "Create object PowerPoint.Application... " -NoNewline
+Write-Host "Creating PowerPoint object to crack file <$($PowerPointFile)>... " -NoNewline
 $PowerPoint = New-Object -ComObject PowerPoint.Application
 Write-Host "OK"
 

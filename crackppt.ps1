@@ -2,7 +2,7 @@
 # Defineix el camí complet de l'arxiu de contrasenyes
 $PowerPointFile = "C:\devel\crackppt\data\viatge2021.pptx"
 $PasswordFile = "C:\devel\crackppt\data\passwords.txt"
-
+$VerboseBatch = 10000
 $ResumeFile = $PowerPointFile + ".resume"
 
 # Crea un objecte PowerPoint per obrir el fitxer
@@ -22,9 +22,12 @@ Write-Host "OK"
 if (Test-Path -Path $ResumeFile) {
     Write-Host "Resume file found, catching up... "
     $continue = Get-Content -Path $ResumeFile
+    Write-Host "Skipping $($continue) passwords... "
     while ( ($line = $reader.ReadLine()) -and $pwds -le $continue) {
         $pwds++
-        Write-Host "`rSkipping $($continue) passwords... $($pwds)" -NoNewline 
+        if ($pwds % $VerboseBatch -eq 0) {
+            Write-Host "`rSkipping $($continue) passwords... $($pwds)" -NoNewline 
+        }
     }
     Write-Host " "
 }
@@ -34,7 +37,9 @@ try {
     while ( ($line = $reader.ReadLine()) ) {
         $Password = $line
         $pwds++
-        Write-Host "`rTrying key #$($pwds): '$Password'                                    " -NoNewline
+        if ($pwds % $VerboseBatch -eq 0) {
+            Write-Host "`rTrying key #$($pwds): '$Password'                                    " -NoNewline
+        }
         # Intenta obrir el fitxer de PowerPoint 
         try {
             $Presentation = $PowerPoint.ProtectedViewWindows.Open($PowerPointFile, $Password)

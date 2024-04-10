@@ -33,37 +33,44 @@ if (Test-Path -Path $ResumeFile) {
 }
 
 # Intenta obrir el fitxer de PowerPoint amb cada contrasenya de la llista
-try {
-    while ( ($line = $reader.ReadLine()) ) {
-        $Password = $line
-        $pwds++
-        if ($pwds % $VerboseBatch -eq 0) {
-            Write-Host "`rTrying key #$($pwds): '$Password'                                    " -NoNewline
+$continue = $true
+do {
+    try {
+        while ( ($line = $reader.ReadLine()) ) {
+            $Password = $line
+            if ($pwds % $VerboseBatch -eq 0) {
+                Write-Host "`rTrying key #$($pwds): '$Password'                                    " -NoNewline
+            }
+            # Intenta obrir el fitxer de PowerPoint 
+            try {
+                $Presentation = $PowerPoint.ProtectedViewWindows.Open($PowerPointFile, $Password)
+                $Presentation.Close()
+                $PowerPoint.Quit()
+                $trencat = 1
+                break
+            }
+            catch {
+            }
+            $pwds++
         }
-        # Intenta obrir el fitxer de PowerPoint 
-        try {
-            $Presentation = $PowerPoint.ProtectedViewWindows.Open($PowerPointFile, $Password)
-            $Presentation.Close()
-            $PowerPoint.Quit()
-            $trencat = 1
-            break
-        }
-        catch {
+    } finally {
+        if ($null -ne $reader) {
+            if ($pwds -gt 0 -and -not $reader.EndOfStream) {
+                $pwds = $pwds - 1
+                Write-Host "`nSaving resume file to point $($pwds)..." -NoNewline
+                $pwds | Out-File -FilePath $ResumeFile
+                Write-Host "OK"
+                $answer = Read-Host "Processing paused. Continue? [S/n]"
+                if ($answer.ToLower() -ne 's') {
+                    $continue = $false
+                } else {
+                    Write-Host "Resuming cracking process"
+                }
+            }
+            $reader.Dispose()
         }
     }
-}
-finally {
-    if ($null -ne $reader) {
-        if ($pwds -gt 0 -and -not $reader.EndOfStream) {
-            $pwds = $pwds - 1
-            Write-Host "`nSaving resume file to point $($pwds)..." -NoNewline
-            $pwds | Out-File -FilePath $ResumeFile
-            Write-Host "OK"
-        }
-        $reader.Dispose()
-    }
-}
-
+} while ($continue)
 
 # Tanca l'objecte PowerPoint
 try {

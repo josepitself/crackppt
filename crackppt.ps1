@@ -2,7 +2,7 @@
 # Defineix el camí complet de l'arxiu de contrasenyes
 $PowerPointFile = "C:\devel\crackppt\data\viatge2021.pptx"
 $PasswordFile = "C:\devel\crackppt\data\passwords.txt"
-$VerboseBatch = 1
+$VerboseBatch = 5000
 $ResumeFile = $PowerPointFile + ".resume"
 
 # Crea un objecte PowerPoint per obrir el fitxer
@@ -57,14 +57,14 @@ while ( ($line = $reader.ReadLine()) -and $continue) {
         $key = [system.console]::readkey($true)
         if (($key.modifiers -band [consolemodifiers]"control") -and ($key.key -eq "C"))
         {
-            $answer = Read-Host "`nProcessing paused. Continue? [S/n]"
+            $answer = Read-Host "`nProcessing paused at point #$($pwds). Continue? [S/n]"
             if ($answer.ToLower() -eq 'n') {
                 Write-Host "Bye!"
                 $continue = $false
                 $reader.Dispose()
                 break
             } else {
-                Write-Host "Resuming cracking process"
+                Write-Host "Resuming cracking process, point #$($pwds)."
                 [console]::TreatControlCAsInput = $true
             }
         }
